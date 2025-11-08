@@ -7,9 +7,9 @@ const cookieParser = require("cookie-parser")
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-    res.send("hello")
-})
+const authRouter = require("./routes/auth");
+
+app.use("/api/", authRouter)
 
 connectDB().then(() => {
     console.log("db connected");
