@@ -1,17 +1,44 @@
 const validator = require("validator")
 
-const validateSignUpData = (req) =>{
-    const {firstName, lastName, email, password} = req.body;
+const validateSignUpData = (req) => {
+    const { firstName, lastName, email, password } = req.body;
 
-    if(!firstName || !lastName){
+    if (!firstName || !lastName) {
         throw new Error("Name is not valid!")
-    }else if(!validator.isEmail(email)){
+    } else if (!validator.isEmail(email)) {
         throw new Error("Email is not valid");
-    }else if(!validator.isStrongPassword(password)){
+    } else if (!validator.isStrongPassword(password)) {
         throw new Error("Please enter a strong password")
+    }
+}
+
+const validateCouponData = (req) => {
+    const { title, code, category, discount, expiryDate } = req.body;
+
+    if (!title || !code || !category || !expiryDate) {
+        throw new Error("All required fields must be provided")
+    } else if (!validator.isLength(title, { min: 2 })) {
+        throw new Error("Title must be at least 2 characters")
+    } else if (!validator.isLength(code, { min: 2 })) {
+        throw new Error("Code must be at least 2 characters")
+    } else if (!validator.isLength(category, { min: 2 })) {
+        throw new Error("Category must be at least 2 characters")
+    } else if (!validator.isDate(expiryDate)) {
+        throw new Error("Invalid Expiry Date")
+    } else if (discount && !validator.isNumeric(discount.toString()) || Number(discount < 0)) {
+        throw new Error("Discount must be a positive number")
+    }
+
+    const expiry = new Date(expiryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0)
+
+    if (expiry < today) {
+        throw new Error("Expiry must be a future date");
     }
 }
 
 module.exports = {
     validateSignUpData,
+    validateCouponData
 }

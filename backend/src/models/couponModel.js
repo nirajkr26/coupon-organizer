@@ -20,15 +20,17 @@ const couponSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        index: true
     },
     discount: {
         type: Number,
-
+        default: 0
     },
     expiryDate: {
         type: Date,
-        required: true
+        required: true,
+        index: true
     }
 }, {
     timestamps: true
