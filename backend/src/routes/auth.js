@@ -4,6 +4,8 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const generateToken = require("../utils/generateToken");
 const capitalizeFirstLetter = require("../utils/capitalizeFirstLetter");
+const Coupon = require("../models/couponModel");
+const cleanUpExpiredCoupons = require("../utils/cleanUpExpiredCoupons");
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
@@ -32,7 +34,7 @@ router.post("/signup", async (req, res) => {
         savedUser.password = undefined;
 
         res.cookie("token", token, {
-            expires: new Date(Date.now() + 7 * 3600000)
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         })
 
         res.json({ message: "User Registered Successfully", data: savedUser });
@@ -58,14 +60,16 @@ router.post("/login", async (req, res) => {
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
+        
         if (isPasswordValid) {
             const token = generateToken(user._id);
             res.cookie("token", token, {
-                expires: new Date(Date.now() + 7 * 3600000)
+                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             })
 
             user.password = undefined;
 
+            await cleanUpExpiredCoupons(user._id);
             res.json({ message: "Login Successful", data: user })
         } else {
             throw new Error("Invalid Credentials")
