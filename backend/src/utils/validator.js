@@ -3,12 +3,24 @@ const validator = require("validator")
 const validateSignUpData = (req) => {
     const { firstName, lastName, email, password } = req.body;
 
-    if (!firstName || !lastName) {
-        throw new Error("Name is not valid!")
+    if (!firstName || !validator.isAlpha(firstName) || !validator.isLength(firstName, { min: 3, max: 20 })) {
+        throw new Error("First Name must contain only letters and should be between 3 to 20 characters")
+    } else if (!lastName || !validator.isAlpha(lastName) || !validator.isLength(lastName, { min: 3, max: 20 })) {
+        throw new Error("Last Name must contain only letters and should be between 3 to 20 characters")
     } else if (!validator.isEmail(email)) {
         throw new Error("Email is not valid");
     } else if (!validator.isStrongPassword(password)) {
         throw new Error("Please enter a strong password")
+    }
+}
+
+const validateProfileUpdateData = (req) => {
+    const { firstName, lastName } = req.body;
+
+    if (!firstName || !validator.isAlpha(firstName) || !validator.isLength(firstName, { min: 3, max: 20 })) {
+        throw new Error("First Name must contain only letters and should be between 3 to 20 characters")
+    } else if (!lastName || !validator.isAlpha(lastName) || !validator.isLength(lastName, { min: 3, max: 20 })) {
+        throw new Error("Last Name must contain only letters and should be between 3 to 20 characters")
     }
 }
 
@@ -40,5 +52,6 @@ const validateCouponData = (req) => {
 
 module.exports = {
     validateSignUpData,
+    validateProfileUpdateData,
     validateCouponData
 }
