@@ -8,8 +8,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 const authRouter = require("./routes/auth");
+const couponRouter = require("./routes/coupon");
 
 app.use("/api/", authRouter)
+app.use("/api/", couponRouter)
+
 
 connectDB().then(() => {
     console.log("db connected");

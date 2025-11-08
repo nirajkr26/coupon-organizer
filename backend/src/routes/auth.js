@@ -10,6 +10,13 @@ router.post("/signup", async (req, res) => {
         validateSignUpData(req);
 
         const { firstName, lastName, email, password } = req.body;
+        const existingUser = await User.findOne({
+            email
+        })
+        if(existingUser){
+            throw new Error("User already Present");
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({
             firstName,
@@ -20,6 +27,8 @@ router.post("/signup", async (req, res) => {
 
         const savedUser = await user.save();
         const token = generateToken(savedUser._id);
+        
+        savedUser.password = undefined;
 
         res.cookie("token", token, {
             expires: new Date(Date.now() + 7 * 3600000)
@@ -35,6 +44,10 @@ router.post("/login", async (req, res) => {
     try {
         const {email, password} = req.body;
        
+        if(!email || !password){
+            throw new Error("Email and Password are required");;
+        }
+
         const user = await User.findOne({
             email
         })
@@ -49,6 +62,8 @@ router.post("/login", async (req, res) => {
             res.cookie("token", token, {
                 expires:new Date(Date.now() + 7 * 3600000)
             })
+            
+            user.password = undefined;
 
             res.json({message:"Login Successful", data: user})
         }else{
