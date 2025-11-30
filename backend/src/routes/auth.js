@@ -6,6 +6,7 @@ const generateToken = require("../utils/generateToken");
 const capitalizeFirstLetter = require("../utils/capitalizeFirstLetter");
 const Coupon = require("../models/couponModel");
 const cleanUpExpiredCoupons = require("../utils/cleanUpExpiredCoupons");
+const jwt = require("jsonwebtoken")
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
@@ -37,7 +38,7 @@ router.post("/signup", async (req, res) => {
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         })
 
-        res.json({ message: "User Registered Successfully", data: savedUser });
+        res.json({ message: "Registered successfully", data: savedUser });
     } catch (err) {
         res.status(400).json({ message: err.message })
     }
@@ -60,7 +61,7 @@ router.post("/login", async (req, res) => {
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
-        
+
         if (isPasswordValid) {
             const token = generateToken(user._id);
             res.cookie("token", token, {
@@ -87,6 +88,20 @@ router.post("/logout", async (req, res) => {
         res.json({ message: "Logout Successful" })
     } catch (err) {
         res.status(400).json({ message: err.message })
+    }
+})
+
+router.get("/verify", async (req, res) => {
+    try {
+        const token = req.cookies.token
+        if (!token) throw new Error("Please Login");
+        const decoded = jwt.verify(token, process.env.SECRET)
+
+        const user = await User.findById(decoded.id).select("_id firstName lastName email")
+
+        res.json({ data: user });
+    } catch (err) {
+        res.status(401).json({ message: err.message });
     }
 })
 
