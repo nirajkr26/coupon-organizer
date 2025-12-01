@@ -42,7 +42,7 @@ const Sidebar = () => {
     }
   }
 
-  const fetchUser = async ()=>{
+  const fetchUser = async () => {
     try {
 
       const response = await axios.get(BASE_URL + "/verify", {
@@ -51,16 +51,18 @@ const Sidebar = () => {
 
       if (response.status === 200) {
         setUser(response.data.data)
-        
+        fetchCoupons()
       }
     } catch (err) {
-
+      if (err.response.data.message === "Please Login") {
+        navigate("/login")
+        toast.warning("Please Login")
+      }
     }
   }
 
   useEffect(() => {
     fetchUser()
-    fetchCoupons()
   }, [])
 
   return (
