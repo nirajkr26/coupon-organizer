@@ -25,7 +25,7 @@ router.post("/coupon", userAuth, async (req, res) => {
             userId: req.user._id,
             title,
             code,
-            category,
+            category: category.charAt(0).toUpperCase() + category.slice(1),
             discount,
             expiryDate: new Date(expiryDate)
         })

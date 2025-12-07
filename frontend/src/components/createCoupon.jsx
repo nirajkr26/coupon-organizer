@@ -2,10 +2,59 @@ import CutIcon from "../icons/CutIcon"
 import Input from "./Input"
 import Select from "./Select";
 import SaveIcon from "../icons/SaveIcon"
-
+import { useRef } from "react";
+import axios from "axios";
+import { BASE_URL } from "../config/config";
+import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 export const CreateCoupon = ({ open, onClose }) => {
     const today = new Date().toISOString().split("T")[0];
+
+    const { coupon, setCoupon } = useAuth()
+
+    const titleRef = useRef(null)
+    const codeRef = useRef(null)
+    const discountRef = useRef(null)
+    const expiryRef = useRef(null)
+    const categoryRef = useRef(null)
+
+    const addCoupon = async () => {
+        const title = titleRef.current?.value.trim()
+        const code = codeRef.current?.value.trim()
+        const discount = discountRef?.current.value.trim()
+        const expiryDate = expiryRef?.current.value.trim()
+        const category = categoryRef?.current.value.trim()
+
+        if (!title || !code || !discount || !expiryDate || !category) {
+            toast.error("Fill all details")
+            return;
+        }
+
+        try {
+            const couponData = { title, code, category, discount, expiryDate }
+
+
+            const response = await axios.post(BASE_URL + "/coupon", couponData, {
+                withCredentials: true
+            })
+
+            const newCoupon = response.data.data
+
+            if (setCoupon && newCoupon) {
+                const currentCoupons = Array.isArray(coupon) ? coupon : [];
+                setCoupon([...currentCoupons, newCoupon])
+            }
+            toast.success("Coupon Added")
+
+            onClose()
+        } catch (err) {
+                console.log(err)
+                const errorMessage = err?.response?.data?.message || err.message
+                toast.error(errorMessage)
+            
+        }
+    }
 
     return (
         <div>
@@ -19,18 +68,18 @@ export const CreateCoupon = ({ open, onClose }) => {
                             </div>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Input type="text" placeholder="Title" />
-                            <Input type="text" placeholder="Code" />
-                            <Input type="Number" placeholder="Discount" customProps={{
+                            <Input reference={titleRef} type="text" placeholder="Title" />
+                            <Input reference={codeRef} type="text" placeholder="Code" />
+                            <Input reference={discountRef} type="Number" placeholder="Discount" customProps={{
                                 min: "1"
                             }} />
 
-                            <Select placeholder="Select Category" options={["Food", "Travel", "Electronics", "Hotels", "Clothes", "Others"]} />
+                            <Select reference={categoryRef} options={["Food", "Travel", "Electronics", "Hotels", "Clothes", "Others"]} />
 
-                            <Input type="date" placeholder="Date" customProps={{ min: today }} />
+                            <Input reference={expiryRef} type="date" placeholder="Date" customProps={{ min: today }} />
 
                         </div>
-                        <button className="bg-red-500 text-white w-full p-2 mt-3 rounded-md hover:bg-red-600 cursor-pointer text-lg font-semibold flex justify-center items-center gap-1"> <SaveIcon />SAVE</button>
+                        <button onClick={addCoupon} className="bg-red-500 text-white w-full p-2 mt-3 rounded-md hover:bg-red-600 cursor-pointer text-lg font-semibold flex justify-center items-center gap-1"> <SaveIcon />SAVE</button>
                     </span>
                 </div>
             </div>}

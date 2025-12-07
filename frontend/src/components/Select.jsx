@@ -1,9 +1,9 @@
-export default function Select({ options, placeholder, onChange }) {
+export default function Select({ options,reference, onChange }) {
     return (
-        <select className="border p-2 rounded-md cursor-pointer" onChange={onchange}>
-            <option value="" disabled selected>{placeholder}</option>
+        <select ref={reference} className="border p-2 rounded-md cursor-pointer" onChange={onChange}>
+            
             {options.map(opt => (
-                <option className="font-mono" value={opt.toLowerCase()} key={opt}>{opt}</option>
+                <option className="font-mono" value={opt} key={opt}>{opt}</option>
             ))}
         </select>
     )
