@@ -21,7 +21,7 @@ router.post("/profile/update", userAuth, async (req, res) => {
             {
                 new: true
             }
-        )
+        ).select("_id firstName lastName email")
 
         res.json({ message: "User updated successfully", data: updatedUser });
 
