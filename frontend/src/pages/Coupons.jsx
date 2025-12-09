@@ -32,11 +32,11 @@ const Coupons = () => {
     <div className='p-4'>
       <div className='flex gap-4   '>
 
-        <input placeholder='Search Coupons' ref={searchRef} onChange={handleSearch} className=' border-2 focus:border-red-500 focus:ring-0 outline-none border-red-400  bg-white p-3 text-lg rounded-lg my-2 w-full' />
-        <button className='bg-red-500 text-white py-3 px-5 my-2 text-lg rounded-lg flex gap-1 justify-center items-center cursor-pointer hover:bg-red-600  '><FilterIcon /> <p>Filter</p></button>
+        <input placeholder='Search Coupons' ref={searchRef} onChange={handleSearch} className=' border-2 focus:border-slate-700 focus:ring-0 outline-none border-slate-700  bg-white p-3 text-lg rounded-lg my-2 w-full' />
+        <button className='bg-slate-700 text-white py-3 px-5 my-2 text-lg rounded-lg flex gap-1 justify-center items-center cursor-pointer hover:bg-black  '><FilterIcon /> <p>Filter</p></button>
       </div>
 
-      <div className='flex flex-wrap gap-2'>
+      <div className='flex flex-wrap justify-around gap-4'>
         {filtered?.length > 0 && filtered.map((c) => (<CouponCard {...c} key={c._id} />))}
       </div>
 

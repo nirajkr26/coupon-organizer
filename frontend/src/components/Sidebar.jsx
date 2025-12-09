@@ -66,7 +66,7 @@ const Sidebar = () => {
   }, [])
 
   return (
-    <div className='h-screen bg-white border-r w-12 md:w-50 fixed left-0 top-0'>
+    <div className='h-screen bg-slate-800 text-white border-r w-12 md:w-50 fixed left-0 top-0'>
       <div className='flex flex-col h-full items-center'>
         <div className='text-3xl cursor-pointer font-bold items-center gap-3 pt-4 flex' onClick={() => navigate("/dashboard")}>{<LogoIcon />}<p className='hidden md:block'>CUPPU</p></div>
         <div className='pt-4 text-center flex flex-col gap-3'>

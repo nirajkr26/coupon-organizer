@@ -87,9 +87,9 @@ const Login = () => {
   }, [])
 
   return (
-    <div className='h-screen bg-red-50 flex flex-col gap-10 justify-center items-center'>
-      <div className='text-3xl font-bold items-center hap-3 pt-4 flex'>{<LogoIcon />} CUPPU</div>
-      <div className='bg-white w-80 p-2 rounded-md border border-gray-400 flex flex-col gap-2'>
+    <div className='h-screen bg-slate-800 flex flex-col gap-10 justify-center items-center'>
+      <div className='text-3xl font-bold text-white items-center hap-3 pt-4 flex'>{<LogoIcon />} CUPPU</div>
+      <div className='bg-white w-80 p-8 rounded-md border border-gray-400 flex flex-col gap-2'>
         {!isLogin && <>
           <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className='border rounded-md p-2' placeholder='First Name' />
           <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className='border rounded-md p-2' placeholder='Last Name' /></>
@@ -97,7 +97,7 @@ const Login = () => {
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className='border rounded-md p-2' placeholder='Email' />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className='border rounded-md p-2' placeholder='Password' />
 
-        <button onClick={handleLogin} className={` hover:bg-red-600 bg-red-500 text-white rounded-md p-2 ${(!email || !password) ? "opacity-70 cursor-not-allowed":"cursor-pointer"}`}>{isLogin ? "Log In" : "Sign Up"}</button>
+        <button onClick={handleLogin} className={` hover:bg-black bg-slate-700 text-white rounded-md p-2 ${(!email || !password) ? "opacity-85 cursor-not-allowed":"cursor-pointer"}`}>{isLogin ? "Log In" : "Sign Up"}</button>
         <p onClick={() => setIsLogin(!isLogin)} className='font-mono cursor-pointer text-center text-sm text-gray-600'>{isLogin ? "New User? Sign Up Here" : "Already Have Account? Log In"}</p>
 
         {showValidation && <div className='text-sm text-center'>
