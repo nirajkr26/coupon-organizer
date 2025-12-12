@@ -37,8 +37,8 @@ const validateCouponData = (req) => {
         throw new Error("Category must be at least 2 characters")
     } else if (!validator.isDate(expiryDate)) {
         throw new Error("Invalid Expiry Date")
-    } else if (discount && !validator.isNumeric(discount.toString()) || Number(discount < 0)) {
-        throw new Error("Discount must be a positive number")
+    } else if (discount && !validator.isNumeric(discount.toString()) || Number(discount) < 0 || Number(discount) > 100) {
+        throw new Error("Discount must be between 1-100")
     }
 
     const expiry = new Date(expiryDate);
@@ -50,8 +50,24 @@ const validateCouponData = (req) => {
     }
 }
 
+const validateUpdateCouponData = (req) => {
+    const { title, code, discount } = req.body;
+
+    if (!title || !code || !discount) {
+        throw new Error("All required fields must be provided")
+    } else if (!validator.isLength(title, { min: 2 })) {
+        throw new Error("Title must be at least 2 characters")
+    } else if (!validator.isLength(code, { min: 2 })) {
+        throw new Error("Code must be at least 2 characters")
+    } else if (discount && !validator.isNumeric(discount.toString()) || Number(discount) < 0 || Number(discount) > 100) {
+        throw new Error("Discount must be between 1-100")
+    }
+
+}
+
 module.exports = {
     validateSignUpData,
     validateProfileUpdateData,
-    validateCouponData
+    validateCouponData,
+    validateUpdateCouponData
 }

@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const userAuth = require("../middlewares/authentication");
-const { validateCouponData } = require("../utils/validator");
+const { validateCouponData, validateUpdateCouponData } = require("../utils/validator");
 const Coupon = require("../models/couponModel")
 
 const router = express.Router();
@@ -43,17 +43,15 @@ router.put("/coupon/:id", userAuth, async (req, res) => {
     try {
         const { id } = req.params;
 
-        validateCouponData(req);
-        const { title, code, category, discount, expiryDate } = req.body;
+        validateUpdateCouponData(req);
+        const { title, code, discount } = req.body;
 
         const updatedCoupon = await Coupon.findOneAndUpdate(
             { _id: id, userId: req.user._id },
             {
                 title,
                 code,
-                category,
-                discount,
-                expiryDate: new Date(expiryDate)
+                discount
             },
             { new: true }
         )
