@@ -35,7 +35,10 @@ router.post("/signup", async (req, res) => {
         savedUser.password = undefined;
 
         res.cookie("token", token, {
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
         })
 
         res.json({ message: "Registered successfully", data: savedUser });
@@ -65,7 +68,10 @@ router.post("/login", async (req, res) => {
         if (isPasswordValid) {
             const token = generateToken(user._id);
             res.cookie("token", token, {
-                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+                httpOnly: true,
+                secure: true,
+                sameSite: "none"
             })
 
             user.password = undefined;
@@ -83,7 +89,10 @@ router.post("/login", async (req, res) => {
 router.post("/logout", async (req, res) => {
     try {
         res.cookie("token", null, {
-            expires: new Date(Date.now())
+            expires: new Date(Date.now()),
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
         })
         res.json({ message: "Logout Successful" })
     } catch (err) {
