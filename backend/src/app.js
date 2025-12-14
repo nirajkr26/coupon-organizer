@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors")
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://coupon-organizer.vercel.app",
     credentials: true
 }))
 app.use(express.json());
