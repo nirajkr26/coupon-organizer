@@ -28,17 +28,28 @@ const Dashboard = () => {
   const [expiring, setExpiring] = useState([]);
 
   const expiringCoupons = () => {
-    const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
+    const EIGHT_DAYS_IN_MS = 8 * 24 * 60 * 60 * 1000;
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const nowTimestamp = startOfToday.getTime();
+
+    const sevenDaysFromNow = nowTimestamp + EIGHT_DAYS_IN_MS;
+
     const expiringCouponsList = [];
 
     coupon.forEach(element => {
-      const expiry = new Date(element.expiryDate).getTime();
-      const diff = expiry - now;
-      if (diff > 0 && diff <= SEVEN_DAYS_IN_MS) {
+
+      const expiryDate = new Date(element.expiryDate);
+      expiryDate.setHours(0, 0, 0, 0);
+      const expiryTimestamp = expiryDate.getTime();
+
+      if (expiryTimestamp >= nowTimestamp && expiryTimestamp < sevenDaysFromNow) {
         expiringCouponsList.push(element);
       }
     });
+
+    expiringCouponsList.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
 
     setExpiring(expiringCouponsList.slice(0, 3));
   };

@@ -5,7 +5,7 @@ import axios from "axios"
 import { BASE_URL } from "../config/config"
 import { toast } from "react-toastify"
 import { useAuth } from "../context/AuthContext"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 
 const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
     const { setCoupon } = useAuth()
@@ -14,13 +14,20 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
     const [couponCode, setCouponCode] = useState(code);
     const [couponDiscount, setCouponDiscount] = useState(discount)
 
+    const isExpired = useMemo(() => {
+        const expiry = new Date(expiryDate);
+        const today = new Date();
+        expiry.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0); 
+        return expiry.getTime() < today.getTime();
+    }, [expiryDate]);
+
     const deleteCoupon = async () => {
         try {
             const response = await axios.delete(BASE_URL + "/coupon/" + _id, {
                 withCredentials: true
             })
-            // Functionality remains the same
-            setCoupon(prev => prev.filter(item => item._id != _id))
+            setCoupon(prev => prev.filter(item => item._id !== _id))
             toast.success("Coupon Deleted")
 
         } catch (err) {
@@ -36,6 +43,12 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
 
         if (Number(couponDiscount) < 1 || Number(couponDiscount) > 100) {
             toast.error("Discount must be between 1-100")
+            return;
+        }
+        
+        if (isExpired) {
+            toast.error("Cannot save changes: This coupon has expired.");
+            setEdit(true); 
             return;
         }
 
@@ -60,8 +73,12 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
         }
     }
 
-
     const handleActionClick = () => {
+        if (isExpired) {
+            toast.warning("Expired coupons cannot be edited.");
+            return;
+        }
+
         if (edit) {
             setEdit(false)
         } else {
@@ -69,41 +86,45 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
         }
     }
 
-    const cardClass = edit
-        ? 'bg-white shadow-xl hover:shadow-2xl'
-        : 'bg-yellow-50 shadow-xl ring-4 ring-blue-500';
+    const cardClass = isExpired
+        ? 'bg-red-50 opacity-80 shadow-md border-2 border-red-300'
+        : edit
+            ? 'bg-white shadow-xl hover:shadow-2xl'
+            : 'bg-yellow-50 shadow-xl ring-4 ring-blue-500';
 
     const inputClass = edit
         ? 'bg-gray-100'
         : 'bg-white border-2 border-blue-400 focus:border-blue-700 focus:ring-1 focus:ring-blue-700';
-
 
     return (
         <div className={`flex flex-col w-full max-w-sm p-5 sm:p-6 rounded-2xl transition-all duration-300 ${cardClass}`}>
 
             <div className='flex justify-between items-start mb-4 pb-2 border-b border-gray-200'>
 
-
                 <input
                     type="text"
                     value={couponTitle}
                     onChange={(e) => setCouponTitle(e.target.value)}
-
                     className={`grow min-w-0 text-xl font-bold p-1 rounded-md transition-colors ${inputClass} ${edit ? 'text-gray-900 border-transparent' : 'text-slate-800'}`}
-                    disabled={edit}
+                    disabled={edit || isExpired} 
                 />
 
 
                 <div className="flex gap-2 ml-4 shrink-0">
-
+                    
                     <button
                         onClick={handleActionClick}
-                        className={`p-2 rounded-full transition-colors hover:scale-110 ${edit ? 'text-blue-600 hover:bg-blue-100' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                        disabled={isExpired} 
+                        className={`p-2 rounded-full transition-colors hover:scale-110
+                            ${isExpired 
+                                ? 'text-gray-400 cursor-not-allowed bg-gray-200'
+                                : edit 
+                                    ? 'text-blue-600 hover:bg-blue-100' 
+                                    : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                         aria-label={edit ? "Edit Coupon" : "Save Changes"}
                     >
                         {edit ? <EditIcon className="w-5 h-5" /> : <SaveIcon className="w-5 h-5" />}
                     </button>
-
 
                     <button
                         onClick={deleteCoupon}
@@ -117,7 +138,6 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
 
 
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 text-sm'>
-
                 <div className='flex flex-col col-span-1'>
                     <span className='text-xs font-semibold uppercase text-gray-500'>Code</span>
                     <input
@@ -125,7 +145,7 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
                         className={`p-2 mt-1 rounded-lg text-lg font-mono ${inputClass} ${edit ? 'border-transparent' : ''} w-full`}
-                        disabled={edit}
+                        disabled={edit || isExpired}
                     />
                 </div>
 
@@ -142,7 +162,7 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
                                 setCouponDiscount(value === "" ? "" : Number(value));
                             }}
                             className={`p-2 pr-8 mt-1 rounded-lg text-lg font-bold ${inputClass} ${edit ? 'border-transparent' : ''} w-full`}
-                            disabled={edit}
+                            disabled={edit || isExpired}
                         />
                         <span className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500'>%</span>
                     </div>
@@ -154,7 +174,7 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
                         type="text"
                         readOnly
                         value={category}
-                        className={`p-2 mt-1 rounded-lg text-gray-700 bg-gray-100 border-transparent w-full`}
+                        className={`p-2 mt-1 rounded-lg text-gray-700 ${isExpired ? 'bg-red-200' : 'bg-gray-100'} border-transparent w-full`}
                         disabled
                     />
                 </div>
@@ -165,17 +185,19 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
                         type="text"
                         readOnly
                         value={new Date(expiryDate).toLocaleDateString()}
-                        className={`p-2 mt-1 rounded-lg text-gray-700 bg-gray-100 border-transparent w-full`}
+                        className={`p-2 mt-1 rounded-lg ${isExpired ? 'text-red-700 bg-red-200 font-bold' : 'text-gray-700 bg-gray-100'} border-transparent w-full`}
                         disabled
                     />
                 </div>
 
             </div>
 
-            {!edit && (
+            {!edit && !isExpired && (
                 <p className="mt-4 text-xs text-blue-600 font-medium">Editing mode active. Click save to apply changes.</p>
             )}
-
+            {isExpired && (
+                <p className="mt-4 text-xs text-red-600 font-bold">⚠️ This coupon has expired and cannot be edited.</p>
+            )}
         </div>
     )
 }
