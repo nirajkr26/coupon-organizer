@@ -19,6 +19,7 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
             const response = await axios.delete(BASE_URL + "/coupon/" + _id, {
                 withCredentials: true
             })
+            // Functionality remains the same
             setCoupon(prev => prev.filter(item => item._id != _id))
             toast.success("Coupon Deleted")
 
@@ -28,11 +29,6 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
     }
 
     const editCoupon = async () => {
-        console.log(typeof (couponTitle))
-        console.log(typeof (couponCode))
-        console.log(typeof (couponDiscount))
-
-
         if (!couponTitle.trim() || !couponCode.trim() || couponDiscount === "") {
             toast.error("Fill all fields");
             return;
@@ -42,7 +38,6 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
             toast.error("Discount must be between 1-100")
             return;
         }
-
 
         try {
             const response = await axios.put(BASE_URL + "/coupon/" + _id, {
@@ -65,43 +60,123 @@ const CouponCard = ({ _id, title, category, code, expiryDate, discount }) => {
         }
     }
 
-    return (
-        <div className='bg-slate-700 shadow-md shadow-slate-800 hover:bg-slate-900 ring-2 ring-blue-800 flex flex-col w-96 gap-2 p-4 rounded-xl'>
-            <div className='flex text-white justify-between'>
-                <span onClick={() => {
-                    if (edit) { setEdit(false) }
-                    else { editCoupon() }
-                }}>
-                    {edit ? <EditIcon /> : <SaveIcon />}
-                </span>
-                <span onClick={deleteCoupon} className="rounded-full p-1 bg-red-500 " ><DeleteIcon /></span></div>
-            <label className='flex gap-1 border border-gray-300 bg-white p-1  justify-between rounded-lg items-center'>
-                <span>Title</span>
-                <input type="text" value={couponTitle} onChange={(e) => setCouponTitle(e.target.value)} className='bg-white border w-40 rounded-lg border-gray-400 p-2' disabled={edit} />
-            </label>
-            <label className='flex gap-1 border border-gray-300 relative bg-white p-1  justify-between rounded-lg items-center'>
-                <span>Code</span>
-                <input type="text" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} className='bg-white border w-40  rounded-lg border-gray-400 p-2' disabled={edit} />
 
-            </label>
-            <label className='flex gap-1 border border-gray-300 bg-white p-1  justify-between rounded-lg items-center'>
-                <span>Discount</span>
-                <input type="number" min={1} max={100} value={couponDiscount} onChange={(e) => {
-                    const value = e.target.value;
-                    setCouponDiscount(value === "" ? "" : Number(value));
-                }} className='bg-white border  w-40 rounded-lg border-gray-400 p-2' disabled={edit} />
-            </label>
-            <label className='flex gap-1 border border-gray-300 bg-white p-1  justify-between rounded-lg items-center'>
-                <span>Category</span>
-                <input type="text" readOnly value={category} className='bg-white border w-40  rounded-lg border-gray-400 p-2' disabled />
-            </label>
-            <label className='flex gap-1 border border-gray-300 bg-white p-1  justify-between rounded-lg items-center'>
-                <span>Expiry</span>
-                <input type="text" readOnly value={new Date(expiryDate).toLocaleDateString()} className='bg-white w-40  border rounded-lg border-gray-400 p-2' disabled />
-            </label>
+    const handleActionClick = () => {
+        if (edit) {
+            setEdit(false)
+        } else {
+            editCoupon()
+        }
+    }
+
+    const cardClass = edit
+        ? 'bg-white shadow-xl hover:shadow-2xl'
+        : 'bg-yellow-50 shadow-xl ring-4 ring-blue-500';
+
+    const inputClass = edit
+        ? 'bg-gray-100'
+        : 'bg-white border-2 border-blue-400 focus:border-blue-700 focus:ring-1 focus:ring-blue-700';
+
+
+    return (
+        <div className={`flex flex-col w-full max-w-sm p-5 sm:p-6 rounded-2xl transition-all duration-300 ${cardClass}`}>
+
+            <div className='flex justify-between items-start mb-4 pb-2 border-b border-gray-200'>
+
+
+                <input
+                    type="text"
+                    value={couponTitle}
+                    onChange={(e) => setCouponTitle(e.target.value)}
+
+                    className={`grow min-w-0 text-xl font-bold p-1 rounded-md transition-colors ${inputClass} ${edit ? 'text-gray-900 border-transparent' : 'text-slate-800'}`}
+                    disabled={edit}
+                />
+
+
+                <div className="flex gap-2 ml-4 shrink-0">
+
+                    <button
+                        onClick={handleActionClick}
+                        className={`p-2 rounded-full transition-colors hover:scale-110 ${edit ? 'text-blue-600 hover:bg-blue-100' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                        aria-label={edit ? "Edit Coupon" : "Save Changes"}
+                    >
+                        {edit ? <EditIcon className="w-5 h-5" /> : <SaveIcon className="w-5 h-5" />}
+                    </button>
+
+
+                    <button
+                        onClick={deleteCoupon}
+                        className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors hover:scale-110"
+                        aria-label="Delete Coupon"
+                    >
+                        <DeleteIcon className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+
+
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 text-sm'>
+
+                <div className='flex flex-col col-span-1'>
+                    <span className='text-xs font-semibold uppercase text-gray-500'>Code</span>
+                    <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        className={`p-2 mt-1 rounded-lg text-lg font-mono ${inputClass} ${edit ? 'border-transparent' : ''} w-full`}
+                        disabled={edit}
+                    />
+                </div>
+
+                <div className='flex flex-col col-span-1'>
+                    <span className='text-xs font-semibold uppercase text-gray-500'>Discount</span>
+                    <div className='relative'>
+                        <input
+                            type="number"
+                            min={1}
+                            max={100}
+                            value={couponDiscount}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setCouponDiscount(value === "" ? "" : Number(value));
+                            }}
+                            className={`p-2 pr-8 mt-1 rounded-lg text-lg font-bold ${inputClass} ${edit ? 'border-transparent' : ''} w-full`}
+                            disabled={edit}
+                        />
+                        <span className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500'>%</span>
+                    </div>
+                </div>
+
+                <div className='flex flex-col col-span-1'>
+                    <span className='text-xs font-semibold uppercase text-gray-500'>Category</span>
+                    <input
+                        type="text"
+                        readOnly
+                        value={category}
+                        className={`p-2 mt-1 rounded-lg text-gray-700 bg-gray-100 border-transparent w-full`}
+                        disabled
+                    />
+                </div>
+
+                <div className='flex flex-col col-span-1'>
+                    <span className='text-xs font-semibold uppercase text-gray-500'>Expires</span>
+                    <input
+                        type="text"
+                        readOnly
+                        value={new Date(expiryDate).toLocaleDateString()}
+                        className={`p-2 mt-1 rounded-lg text-gray-700 bg-gray-100 border-transparent w-full`}
+                        disabled
+                    />
+                </div>
+
+            </div>
+
+            {!edit && (
+                <p className="mt-4 text-xs text-blue-600 font-medium">Editing mode active. Click save to apply changes.</p>
+            )}
 
         </div>
-
     )
 }
 

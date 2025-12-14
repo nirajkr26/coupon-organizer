@@ -34,7 +34,6 @@ export const CreateCoupon = ({ open, onClose }) => {
         try {
             const couponData = { title, code, category, discount, expiryDate }
 
-
             const response = await axios.post(BASE_URL + "/coupon", couponData, {
                 withCredentials: true
             })
@@ -55,49 +54,91 @@ export const CreateCoupon = ({ open, onClose }) => {
         }
     }
 
-    return (
-        <div>
-            {open && <div className="h-screen w-screen bg-slate-900/66 fixed top-0 left-0 flex transition-all justify-center">
-                <div className="flex flex-col justify-center">
-                    <span className="bg-white p-6 w-82 rounded-2xl">
+    if (!open) return null;
 
-                        <div className="flex justify-end cursor-pointer mb-2">
-                            <div onClick={onClose}>
-                                <CutIcon />
-                            </div>
+    return (
+
+        <div className="fixed inset-0 z-50 bg-slate-900/70 flex items-center justify-center transition-opacity">
+
+
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 transform transition-all duration-300 scale-100 opacity-100">
+
+
+                <div className="p-5 border-b border-gray-200 flex justify-between items-center">
+                    <h2 className="text-2xl font-bold text-slate-800">Create New Coupon</h2>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100"
+                        aria-label="Close modal"
+                    >
+                        <CutIcon className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <div className="p-6 space-y-4">
+
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div className="text-left pb-1 text-slate-700 text-sm font-semibold">Coupon Title</div>
+
+                            <Input reference={titleRef} type="text" placeholder="e.g., Summer Sale 2026" />
                         </div>
-                        <div className="flex flex-col gap-1">
-                            <div>
-                                <div className="text-left pb-1  text-slate-600  text-md font-semibold">Title</div>
-                                <Input reference={titleRef} type="text" placeholder="Cuppu" />
-                            </div>
-                            <div>
-                                <div className="text-left py-1 text-slate-600 text-md font-semibold">Coupon Code</div>
-                                <Input reference={codeRef} type="text" placeholder="AX729Y38" />
-                            </div>
-                            <div>
-                                <div className="text-left py-1 text-slate-600  text-md font-semibold">Discount %</div>
-                                <Input reference={discountRef} type="Number" placeholder="1-100" customProps={{
+                        <div>
+                            <div className="text-left pb-1 text-slate-700 text-sm font-semibold">Coupon Code</div>
+                            <Input reference={codeRef} type="text" placeholder="e.g., SUM729Y" />
+                        </div>
+                    </div>
+
+
+                    <div className="grid grid-cols-3 gap-4">
+
+                        <div>
+                            <div className="text-left pb-1 text-slate-700 text-sm font-semibold">Discount (%)</div>
+                            <Input
+                                reference={discountRef}
+                                type="Number"
+                                placeholder="1-100"
+                                customProps={{
                                     min: "1",
                                     max: "100"
-                                }} />
-                            </div>
-                            <div className="">
-                                <div className="text-left py-1  text-slate-600 text-md font-semibold">Category</div>
-                                <Select reference={categoryRef} options={["Food", "Travel", "Electronics", "Hotels", "Clothes", "Others"]} />
-                            </div>
-
-                            <div>
-                                <div className="text-left py-1 text-slate-600  text-md font-semibold">Expiry Date</div>
-                                <Input reference={expiryRef} type="date" placeholder="Date" customProps={{ min: today }} />
-                            </div>
-
-
+                                }}
+                            />
                         </div>
-                        <button onClick={addCoupon} className="bg-slate-700 text-white w-full p-2 mt-3 rounded-md hover:bg-black cursor-pointer text-lg font-semibold flex justify-center items-center gap-1"> <SaveIcon />SAVE</button>
-                    </span>
+
+                        <div>
+                            <div className="text-left pb-1 text-slate-700 text-sm font-semibold">Category</div>
+
+                            <Select
+                                reference={categoryRef}
+                                options={["Food", "Travel", "Electronics", "Hotels", "Clothes", "Others"]}
+                            />
+                        </div>
+
+                        <div>
+                            <div className="text-left pb-1 text-slate-700 text-sm font-semibold">Expiry Date</div>
+                            <Input
+                                reference={expiryRef}
+                                type="date"
+                                placeholder="Select Date"
+                                customProps={{ min: today }}
+                            />
+                        </div>
+                    </div>
+
                 </div>
-            </div>}
+
+                <div className="p-5 pt-0">
+                    <button
+                        onClick={addCoupon}
+                        className="bg-blue-600 text-white w-full p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer text-lg font-bold flex justify-center items-center gap-2 shadow-md shadow-blue-200"
+                    >
+                        <SaveIcon className="w-5 h-5" />
+                        CREATE COUPON
+                    </button>
+                </div>
+
+            </div>
         </div>
     )
 }
