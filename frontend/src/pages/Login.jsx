@@ -6,6 +6,7 @@ import { usePasswordValidation } from "../hooks/usePasswordValidation"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { useAuth } from '../context/AuthContext'
+import ButtonSpinner from '../components/ButtonSpinner'
 
 
 
@@ -26,6 +27,7 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const { password, setPassword, validation } = usePasswordValidation();
+  const [loading, setLoading] = useState(false);
 
   const showValidation = !isLogin && password.length >= 1;
 
@@ -48,6 +50,7 @@ const Login = () => {
     }
 
     try {
+      setLoading(true)
       const endpoint = isLogin ? "/login" : "/signup";
       const payload = isLogin ? { email, password } : { firstName, lastName, email, password };
 
@@ -57,9 +60,10 @@ const Login = () => {
         toast.success(response.data.message)
         navigate("/dashboard")
       }
-
+      setLoading(false)
     } catch (err) {
       toast.error(err.response?.data?.message || "An unknown error occurred.");
+      setLoading(false)
     }
   }
 
@@ -154,12 +158,12 @@ const Login = () => {
           <button
             onClick={handleLogin}
             disabled={isButtonDisabled}
-            className={`font-semibold py-3 rounded-lg text-lg transition-all duration-300
+            className={`font-semibold py-3 rounded-lg text-lg transition-all flex justify-center gap-1 items-center duration-300
                             ${isButtonDisabled
                 ? 'bg-indigo-300 text-white cursor-not-allowed'
                 : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg'}`}
           >
-            {isLogin ? "Log In" : "Sign Up"}
+            {loading ? <>Loading <ButtonSpinner /></> : (isLogin ? "Log In" : "Sign Up")}
           </button>
 
 
